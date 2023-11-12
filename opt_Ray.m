@@ -1,7 +1,6 @@
 tic;  % Start timing
 [opt_policy, min_population]=optimize_policy();
 elapsedTime = toc;  % End timing and store the elapsed time in elapsedTime
-
 fprintf('Elapsed time: %.3f seconds\n', elapsedTime);
 
 function [optimal_policy, minimal_population] = optimize_policy()

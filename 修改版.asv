@@ -1,10 +1,30 @@
-tic;  % Start timing
-[opt_policy, min_population]=optimize_policy();
-elapsedTime = toc;  % End timing and store the elapsed time in elapsedTime
+% Define ranges for C_inspection and C_tree_trap
+C_inspection_values = [1, 2, 3]; % Example values
+C_tree_trap_values = [1, 2, 3]; % Example values
 
-fprintf('Elapsed time: %.3f seconds\n', elapsedTime);
+% Prepare a structure or cell array to store results
+results = struct();
 
-function [optimal_policy, minimal_population] = optimize_policy()
+% Grid search
+for i = 1:length(C_inspection_values)
+    for j = 1:length(C_tree_trap_values)
+        % Update costs
+        C_inspection = C_inspection_values(i);
+        C_tree_trap = C_tree_trap_values(j);
+        tic;  % Start timing
+        % Run optimization with updated costs
+        [opt_policy, min_population] = optimize_policy(C_inspection, C_tree_trap);
+        elapsedTime = toc;  % End timing and store the elapsed time in elapsedTime
+        fprintf('Elapsed time: %.3f seconds\n', elapsedTime);
+        % Store results
+        key = sprintf('Inspection_%d_TreeTrap_%d', C_inspection, C_tree_trap);
+        results.(key).opt_policy = opt_policy;
+        results.(key).min_population = min_population;
+    end
+end
+
+
+function [optimal_policy, minimal_population] = optimize_policy(C_inspection, C_tree_trap)
     % Define optimization options
     options = optimoptions('ga');
 
@@ -22,9 +42,8 @@ years=5;
 
     % Run genetic algorithm
     %这样可以跑，但是是小数
-    [x, fval] = ga(@objective_function, nvars, [], [], [], [], lb, ub, @constraint_function, options);
-    %理论上应该是这样的
-    %[x, fval] = ga(@objective_function, nvars, [], [], [], [], lb, ub, @constraint_function,intcon, options);
+    [x, fval] = ga(@objective_function, nvars, [], [], [], [], lb, ub, @@(x)constraint_function(x, C_inspection, C_tree_trap), options);
+    
 
     % Reshape solution into policy format
     optimal_policy = reshape(x, [num_county, 2, years]);
@@ -76,9 +95,9 @@ traffic_matrix(14,14)=1-sum(traffic_matrix(14,1:13));
 
 %traffic_matrix(i,j)表示从i到j的流量,(i,i)表示留在i的量，一行和为1
 
-food_condition=[2;2;2;2;2;1;2;1;1;1;3;2;3;3]; %food condition based on tree of heaven, 1 means normal, >1 means better
-tree_trap_effectiveness=0.2; %trap effectiveness
-inspection_effectiveness=0.2; %inspection effectiveness
+food_condition=[1.5;1.5;1.5;1.5;1.5;1;1.5;1;1;1;2;1.5;2;2]; %food condition based on tree of heaven, 1 means normal, >1 means better
+tree_trap_effectiveness=0.7; %trap effectiveness
+inspection_effectiveness=0.7; %inspection effectiveness
 
 %other parameters
 % these are survival rate of different stages and reproduction rate
@@ -100,8 +119,7 @@ population(:,:,1)=initial_population;
 end
 
 function [c, ceq] = constraint_function(x)
-    C_inspection=1; %cost for action
-    C_tree_trap=1;
+   
     num_county=14;
     years=5;
     % Reshape x into policy format

@@ -21,11 +21,11 @@ years=5;
     %这样可以跑，但是是小数
     [x, fval] = ga(@objective_function, nvars, [], [], [], [], lb, ub, @constraint_function, options);
     %理论上应该是这样的
-    [x, fval] = ga(@objective_function, nvars, [], [], [], [], lb, ub, @constraint_function,intcon, options);
+    %[x, fval] = ga(@objective_function, nvars, [], [], [], [], lb, ub, @constraint_function,intcon, options);
 
     % Reshape solution into policy format
     optimal_policy = reshape(x, [num_county, 2, years]);
-    minimal_population = -fval; % Negative because we minimized the negative population
+    minimal_population = fval;
 end
 function total = objective_function(x)
     num_county=15;%暂时先设成这样，麻烦你们填入真实的数据
@@ -57,7 +57,7 @@ population(:,:,1)=initial_population;
     Sen,San,F,policy,years,population);
 
     % Objective is to minimize population
-    total = -1*final_population; % Negative for minimization
+    total = final_population; % Negative for minimization
 end
 
 function [c, ceq] = constraint_function(x)
@@ -69,12 +69,13 @@ function [c, ceq] = constraint_function(x)
     policy = reshape(x, [num_county, 2, years]);
     total_reource_per_year=10;
 
-    % Check if policy is valid
-    valid = check_valid(policy, total_reource_per_year, C_inspection, C_tree_trap);
-
     % Inequality constraints (none in this case)
     c = [];
 
-    % Equality constraints (valid must be 1, so valid - 1 must be 0)
-    ceq = valid - 1;
+    % Equality constraints )
+    ceq =[ total_reource_per_year-(sum(policy(:,1,1))*C_inspection+sum(policy(:,2,1))*C_tree_trap);
+        total_reource_per_year-(sum(policy(:,1,2))*C_inspection+sum(policy(:,2,2))*C_tree_trap);
+        total_reource_per_year-(sum(policy(:,1,3))*C_inspection+sum(policy(:,2,3))*C_tree_trap);
+        total_reource_per_year-(sum(policy(:,1,4))*C_inspection+sum(policy(:,2,4))*C_tree_trap);
+        total_reource_per_year-(sum(policy(:,1,5))*C_inspection+sum(policy(:,2,5))*C_tree_trap)];
 end

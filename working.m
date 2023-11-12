@@ -22,7 +22,7 @@ F=47.73;
 % 2 policy and 5 years
 % one row is one county and one page is one year; first is inspection, second is tree trap; 0 means no action
 policy=zeros(num_county,2,years); %total cost in each year should be less than total_reource_per_year
-
+policy=opt_policy;
 % population matrix
 % one row is one county and one page is one year
 population=zeros(num_county, 3 ,years+1);
@@ -32,7 +32,9 @@ final_population=simulation(num_county,traffic_matrix,...
     food_condition,tree_trap_effectiveness,inspection_effectiveness,...
     Sen,San,F,policy,years,population);
 
-function total=simulation(num_county,traffic_matrix,...
+valid=check_valid(policy,total_reource_per_year,C_inspection,C_tree_trap);
+
+function population=simulation(num_county,traffic_matrix,...
     food_condition,tree_trap_effectiveness,inspection_effectiveness,...
     Sen,San,F,policy,years,population)
     for y = 1:years
@@ -49,9 +51,10 @@ function total=simulation(num_county,traffic_matrix,...
                 eggs_with_traffic(i)=eggs_with_traffic(i)+local_eggs*(1-tree_trap_effectiveness*policy(i,2,y));
             end
             for j = 1:num_county
-                if i~=j && policy(i,1,y)~=0 %inspection reduce eggs transfered to other county
+                if i~=j && policy(i,1,y)==0 %inspection reduce eggs transfered to other county
                     eggs_with_traffic(j)=eggs_with_traffic(j)+eggs*traffic_matrix(i,j);
-                else
+            
+                elseif i~=j
                     eggs_with_traffic(j)=eggs_with_traffic(j)+eggs*traffic_matrix(i,j)*(1-inspection_effectiveness*policy(i,1,y));
                 end
             end

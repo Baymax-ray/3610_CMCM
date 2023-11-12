@@ -17,7 +17,7 @@ function total=simulation_total(num_county,traffic_matrix,...
             for j = 1:num_county
                 if i~=j && policy(i,1,y)~=0 %inspection reduce eggs transfered to other county
                     eggs_with_traffic(j)=eggs_with_traffic(j)+eggs*traffic_matrix(i,j);
-                else
+                elseif i~=j
                     eggs_with_traffic(j)=eggs_with_traffic(j)+eggs*traffic_matrix(i,j)*(1-inspection_effectiveness*policy(i,1,y));
                 end
             end

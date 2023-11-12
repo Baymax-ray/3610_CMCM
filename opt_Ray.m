@@ -1,12 +1,3 @@
-% Test the constraint function
-num_county=15;
-years=5;
-
-sample_x = rand(1, num_county * 2 * years); % Sample random values
-[c_test, ceq_test] = constraint_function(sample_x);
-disp(['c_test: ', num2str(c_test)]);
-disp(['ceq_test: ', num2str(ceq_test)]);
-
 
 [opt_policy, min_population]=optimize_policy();
 

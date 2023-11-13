@@ -7,8 +7,7 @@
 % policy matrix
 % 2 policy and 5 years
 % one row is one county and one page is one year; first is inspection, second is tree trap; 0 means no action
-policy=zeros(num_county,2,years); %total cost in each year should be less than total_reource_per_year
-policy=results.Inspection_10_TreeTrap_10.opt_policy;
+
 % population matrix
 % one row is one county and one page is one year
 population=zeros(num_county, 3 ,years+1);
@@ -31,6 +30,29 @@ for i = 1:16
     Sen,San,F,policy,years,population);
     final_storage(:,:,:,i)=final_population;
 end
+%% plot
+figure
+colors = jet(16);
+for i=1:16
+    fieldParts = strsplit(fields{i}, '_');
+    inspectionCost = fieldParts{2}; % Get the inspection cost
+    treeTrapCost = fieldParts{4};   % Get the tree trap cost
+    %get cost to be 1/10 of the original cost
+    inspectionCost=str2num(inspectionCost)/10;
+    treeTrapCost=str2num(treeTrapCost)/10;
+
+    population=final_storage(:,:,:,i);
+    %sum the amount of adult (2nd dimenstion=end) over regions (1st dimension)
+    plot(1:years+1, squeeze(sum(population(:,3,:),1)), 'LineWidth', 2, 'Color', colors(i,:))
+    hold on
+    legendInfo{i} = ['Inspection Cost ', num2str(inspectionCost), ' Tree Trap Cost ', num2str(treeTrapCost)];
+
+end
+legend(legendInfo)
+xlabel('Year')
+ylabel('Adult Population')
+title('Adult Population over Years')
+hold off
 
 %% 
 
@@ -62,15 +84,3 @@ function population=simulation(num_county,traffic_matrix,...
         end
     end
 end
-
-function valid=check_valid(policy,total_reource_per_year,C_inspection,C_tree_trap)
-    valid=1;
-    for y = 1:size(policy,3)
-        if sum(policy(:,1,y))*C_inspection+sum(policy(:,2,y))*C_tree_trap>total_reource_per_year
-            valid=0;
-            return
-        end
-    end
-end
-
-

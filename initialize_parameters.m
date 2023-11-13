@@ -16,6 +16,19 @@ function [num_county, years, initial_population, traffic_matrix, food_condition,
     F = 47.73;
 end
 
+function initial_population_new=population_with_uncertainty(initial_population)
+    initial_population_new=zeros(14,3);
+    for i=1:14
+        if initial_population(i,end)==0
+            %uniform distribution from 0 to 200
+            initial_population_new(i,end)=200*rand;
+        else
+            %uniform distribution error from -0.5% to 0.5%
+            initial_population_new(i,end)=initial_population(i,end)*(1+0.005*(2*rand-1));
+        end
+    end
+end
+
 function traffic_matrix = generate_traffic_matrix()
     traffic_matrix1=diag([0.5 0.5 0.5 0.5 0.2 0.5 0.5 0.2 0.2 0.5 0.2 0.5 0.8 0.5]);
     traffic_matrix2=zeros(14,14);

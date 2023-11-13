@@ -1,6 +1,6 @@
 % Define ranges for C_inspection and C_tree_trap
-C_inspection_values = [1, 0.6, 0.3,1.5]; % Example values
-C_tree_trap_values = [1, 0.6, 0.3,1.5]; % Example values
+C_inspection_values = [1]; % Example values
+C_tree_trap_values = [1]; % Example values
 
 % Prepare a structure or cell array to store results
 results = struct();
@@ -26,7 +26,7 @@ end
 
 function [optimal_policy, minimal_population] = optimize_policy(C_inspection, C_tree_trap)
     % Define optimization options
-    options = optimoptions('ga');
+    options = optimoptions('ga','MaxGenerations', 800);
 
     num_county=14;
     years=5;
@@ -45,7 +45,7 @@ function [optimal_policy, minimal_population] = optimize_policy(C_inspection, C_
     minimal_population = fval;
 end
 
-function total = objective_function(x)
+function eco_loss = objective_function(x)
     %parameter
     [num_county, years, initial_population, traffic_matrix, food_condition, tree_trap_effectiveness, inspection_effectiveness, Sen, San, F] = initialize_parameters();
     %initial population of each county, 1st column is eggs, 2nd is Nymphs and 3rd is Adults
@@ -66,6 +66,8 @@ function total = objective_function(x)
 
     % Objective is to minimize total population
     total = sum(final_population(:,3,end));
+    % eco
+    eco_loss=E_loss(final_population);
 end
 
 function [c, ceq] = constraint_function(x, C_inspection, C_tree_trap)

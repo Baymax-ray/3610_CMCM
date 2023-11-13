@@ -6,6 +6,7 @@ function [num_county, years, initial_population, traffic_matrix, food_condition,
     initial_population=[0 0 0 0 0 0 0 0 0 0 0 0 0 0;
 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
 0 20 0 0 0 10 70 0 40 60 110 920 45020 1060]';
+    initial_population=population_with_uncertainty(initial_population);
     traffic_matrix = generate_traffic_matrix();
     food_condition=[1.5;1.5;1.5;1.5;1.5;1;1.5;1;1;1;2;1.5;2;2]; %food condition based on tree of heaven, 1 means normal, >1 means better
     tree_trap_effectiveness=0.7; %trap effectiveness

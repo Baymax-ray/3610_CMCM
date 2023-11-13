@@ -8,11 +8,13 @@
 % 2 policy and 5 years
 % one row is one county and one page is one year; first is inspection, second is tree trap; 0 means no action
 policy=zeros(num_county,2,years); %total cost in each year should be less than total_reource_per_year
-policy=results.Inspection_10_TreeTrap_10.opt_policy;
+policy=opt_policy;
 % population matrix
 % one row is one county and one page is one year
 population=zeros(num_county, 3 ,years+1);
 population(:,:,1)=initial_population;
+
+
 
 
 final_population=simulation(num_county,traffic_matrix,...
